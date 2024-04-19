@@ -2,7 +2,7 @@ import os
 import re
 import random
 import mailServices.mail as mail
-import encryptionService.encryptions as encryption
+import encryptionServices.encryptions as encryption
 
 def check_if_user_exist(user):
     path = ".//data//private//"
