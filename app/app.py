@@ -1,6 +1,6 @@
 import middleware.userServices.user as user
 
-def run():
+def temprun():
     print("0. Exit")
     print("1. Signup")
     print("2. Login")
@@ -42,4 +42,4 @@ def run():
             camera()
         elif c == "2":
             enrypt_file()
-        
+
