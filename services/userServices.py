@@ -4,14 +4,15 @@ import random
 import services.mailServices as mail
 import services.encryptionServices as encryption
 
+path = ".//data//private//"
+
 # Func: Verify Email Regex
 def verify(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
 # Func: Check if a user Exist
-def check_if_user_exist(user):
-    path = ".//data//private//"
+def check_if_user_exist(user):    
     
     for (root, dirs, file) in os.walk(path):
         for f in file:
@@ -52,25 +53,25 @@ def signup(email,password):
 
  # Func: Login 
 def login(email,password):
-    if check_if_user_exist(email):
+    if not check_if_user_exist(email):
         return -1 
-    
-    with open(email+".oec","w") as f:
-        if encryption.md5_hash(password) != f.read()[:-2]:
-            print("Password does not match!")
-            return -2
 
+    file_path = path + email + ".oec"    
+    with open(file_path,"r") as f:
+        if encryption.md5_hash(password) != f.read():
+            return -2
+        
     return 1
 
 # Func: Delete Existing Account
 def create_account(email,password):
-    file_path = ".//data//private//"+email+".oec"    
+    file_path = path + email + ".oec"    
     with open(file_path,"w") as f:
         f.write(encryption.md5_hash(password))
     
 # Func: Delete Existing Account
 def delete_account(email):
-    file_path = ".//data//private//"+email+".oec"    
+    file_path = path + email + ".oec"    
     try:
         os.remove(file_path)
     except Exception:

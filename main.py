@@ -58,8 +58,8 @@ class encryption_app:
             case -2:
                 self.error = "Invalid Credentials!"
             case _:
-                self.error = "login"
                 self.create_otp_screen()
+                return
         
         messagebox.showerror("Login Failed", self.error)
 
@@ -172,8 +172,8 @@ class encryption_app:
     def create_otp_screen(self):
         self.clear_screen()
 
-        messagebox.showinfo("OTP", "OTP send to mail.")
         otp = user.send_otp(self.email)
+        messagebox.showinfo("OTP", "OTP send to mail.")
         
          # Create a frame to contain the widgets
         frame = tk.Frame(self.master)
