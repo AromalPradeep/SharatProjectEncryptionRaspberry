@@ -1,0 +1,49 @@
+# .gitignore
+
+# Virtual Environments
+venv/
+.env/
+
+# Dependency Management
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+*.pyc
+*.pyo
+__pycache__/
+
+# Logs and Temporary Files
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# IDE/Editor
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Environment Configuration
+.env
+.env.local
+
+# Output and Build
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# User-specific Files
+.bash_history
+.bashrc
+.viminfo
+
+# Operating System Files
+.DS_Store
+Thumbs.db
