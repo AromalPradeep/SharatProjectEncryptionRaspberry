@@ -1,4 +1,5 @@
 # .gitignore
+test/
 
 # Virtual Environments
 venv/

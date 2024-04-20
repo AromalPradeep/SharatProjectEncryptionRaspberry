@@ -1,6 +1,7 @@
 import os
 import cv2
 from PIL import Image, ImageTk
+import datetime
 
 # Tkinter
 import tkinter as tk
@@ -8,6 +9,9 @@ from tkinter import messagebox
 
 # Services
 import services.userServices as user
+import services.fileServices as file
+import services.voiceServices as voice
+import services.algoServices as algo
 
 class encryption_app:
     
@@ -29,7 +33,8 @@ class encryption_app:
         password = self.password_entry.get()
         
         if self.email == "admin" and password == "admin":
-            self.create_menu()        
+            self.create_menu()    
+            return    
 
         match user.signup(self.email,password):
             case -1:
@@ -50,7 +55,8 @@ class encryption_app:
         password = self.password_entry.get()
         
         if self.email == "admin" and password == "admin":
-            self.create_menu()        
+            self.create_menu()      
+            return  
 
         match user.login(self.email,password):
             case -1:
@@ -103,7 +109,9 @@ class encryption_app:
     def capture_image(self):
         ret, frame = self.cap.read()
         if ret:
-            cv2.imwrite("captured_image.png", frame)
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            path = ".//data//images//"
+            cv2.imwrite(path+"image_"+timestamp+".png", frame)
             messagebox.showinfo("Capture", "Image captured successfully!")
 
     # func: populate files
@@ -132,6 +140,37 @@ class encryption_app:
     def clear_screen(self):
         for widget in self.master.winfo_children():
             widget.destroy()
+
+    def encrypt_file(self):
+        mail = self.mail
+        key = self.key.get()
+        path = self.textbox.get()
+        algo.encrypt(mail,key,path)
+       
+    def decrypt_file(self):
+        mail = self.mail
+        key = self.key.get()
+        path = self.textbox.get()
+        algo.decrypt(mail,key,path)
+   
+    def voice_key(self):
+        self.key.delete(1.0, tk.END)
+        self.key.insert(tk.END, voice.listen())
+       
+   
+    def open_file(self):
+        filename = self.textbox.get()
+        if file.open_file(filename):
+            messagebox.showinfo("Open File", filename+" successfully opened!")            
+            return
+        messagebox.showerror("Open File", filename+" could not be opened!")  
+        
+    def delete_file(self):
+        filename = self.textbox.get()
+        if file.delete_file(filename):
+            messagebox.showinfo("Delete File", filename+" successfully deleted!")            
+            return
+        messagebox.showerror("Delete File", filename+" could not be deleted!")   
    
     # Func: exit
     def exit_application(self):
@@ -275,16 +314,22 @@ class encryption_app:
         scrollbar.config(command=self.file_listbox.yview)
 
         # Create a button to choose a file
-        self.choose_button = tk.Button(frame, text="Choose", command=self.choose_file)
+        self.choose_button = tk.Button(frame, text="Open", command=self.choose_file)
         self.choose_button.pack()
 
         # Create a text box for displaying file information
         self.textbox = tk.Text(frame, height=4, width=30)
         self.textbox.pack(padx=10, pady=10)
+        
+        self.key = tk.Text(frame, height=4, width=30)
+        self.key.pack(padx=10, pady=10)
 
         # Create buttons for various actions
         encrypt_button = tk.Button(frame, text="Encrypt")
         encrypt_button.pack(side=tk.LEFT, padx=5, pady=5)
+        
+        decrypt_button = tk.Button(frame, text="Decrypt")
+        decrypt_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         voice_button = tk.Button(frame, text="Voice")
         voice_button.pack(side=tk.LEFT, padx=5, pady=5)
