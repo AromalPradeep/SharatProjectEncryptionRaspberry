@@ -20,10 +20,14 @@ class encryption_app:
         self.master.title("Encryption App")
         self.master.geometry("800x400")
 
+        self.current_path = "D:\Programming2\Projects\SharatProject\data\pictures"
         self.error = ""
         self.exit_flag = 3
 
-        self.create_login_signup_widgets()
+        # self.create_login_signup_widgets()
+        self.email = "admin"
+        self.files_option()
+
 
     # Func: signup
     def signup(self):
@@ -110,67 +114,106 @@ class encryption_app:
         ret, frame = self.cap.read()
         if ret:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            path = ".//data//images//"
+            path = ".//data//pictures//"
             cv2.imwrite(path+"image_"+timestamp+".png", frame)
             messagebox.showinfo("Capture", "Image captured successfully!")
 
-    # func: populate files
     def populate_listbox(self, path):
-        # Clear the listbox
         self.file_listbox.delete(0, tk.END)
+        self.label.config(text=f"Current Directory: {path}")
+        self.current_path = path
 
-        # Get a list of files and directories in the given path
-        files = os.listdir(path)
+        # Add ".." to go back to the parent directory
+        # self.file_listbox.insert(tk.END, "..")
 
-        # Add each file or directory to the listbox
-        for item in files:
-            self.file_listbox.insert(tk.END, item)
+        for item in sorted(os.listdir(path)):
+            full_path = os.path.join(path, item)
+            display_name = f"{item} /" if os.path.isdir(full_path) else item
+            self.file_listbox.insert(tk.END, display_name)
+
+    def open_folder(self):
+        selected_index = self.file_listbox.curselection()
+        if selected_index:
+            selected_item = self.file_listbox.get(selected_index)
+            # Handle going back to parent directory
+            if selected_item == "..":
+                self.go_back()
+            else:
+                new_path = os.path.join(self.current_path, selected_item.rstrip(' /'))
+                if os.path.isdir(new_path):
+                    self.populate_listbox(new_path)
+
+    def go_back(self):
+        parent_directory = os.path.dirname(self.current_path)
+        if parent_directory != self.current_path:  # Prevent going back from the root directory
+            self.populate_listbox(parent_directory)
 
     # func: choose files
     def choose_file(self):
         selected_file_index = self.file_listbox.curselection()
-        if selected_file_index:
-            selected_file = self.file_listbox.get(selected_file_index)
-            self.textbox.delete(1.0, tk.END)
-            self.textbox.insert(tk.END, selected_file)
-        else:
+        if not selected_file_index:
             messagebox.showwarning("Warning", "Please select a file.")
+            return -1
+        selected_file = self.file_listbox.get(selected_file_index)
+        file_path = self.current_path + "\\" + selected_file
+        # self.textbox.delete(1.0, tk.END)
+        # self.textbox.insert(tk.END, file_path)
+        return file_path
+
+    def encrypt_file(self):
+        path = self.choose_file()
+        if path == -1:
+            return
+        mail = self.email
+        key = self.key.get("1.0",tk.END)
+        if algo.encrypt(mail,key,path):
+            messagebox.showinfo("Encrypt File", path+" successfully Encrypted!") 
+            algo.save_key(mail,key,path) 
+            return
+        messagebox.showerror("Encrypt File", path+" could not be Encrypted!") 
+       
+    def decrypt_file(self):
+        path = self.choose_file()
+        if path == -1:
+            return
+        mail = self.email
+        key = self.key.get("1.0",tk.END)
+
+        if not algo.check_key(mail,key,path):
+            messagebox.showerror("Decrypt File", path+" could not be Decrypted! Credentials does not match!")             
+            return
+        
+        if algo.decrypt(mail,key,path):
+            messagebox.showinfo("Decrypt File", path+" successfully Decrypted!")   
+            algo.delete_key(mail,key,path)
+            return
+        messagebox.showerror("Decrypt File", path+" could not be Decrypted! Decryption Error.") 
+   
+    def voice_key(self):
+        self.key.delete(1.0, tk.END)
+        self.key.insert(tk.END, voice.listen())       
+   
+    def open_file(self):
+        filename = self.choose_file()        
+        if file.open_file(filename):
+            # messagebox.showinfo("Open File", filename+" successfully opened!")            
+            return
+        messagebox.showerror("Open File", filename+" could not be opened!")  
+        
+    def delete_file(self):
+        filename = self.choose_file()
+        if filename == -1:
+            return
+        if file.delete_file(filename):
+            messagebox.showinfo("Delete File", filename+" successfully deleted!")   
+            self.files_option()         
+            return
+        messagebox.showerror("Delete File", filename+" could not be deleted!")   
 
     # func: remove elements
     def clear_screen(self):
         for widget in self.master.winfo_children():
             widget.destroy()
-
-    def encrypt_file(self):
-        mail = self.mail
-        key = self.key.get()
-        path = self.textbox.get()
-        algo.encrypt(mail,key,path)
-       
-    def decrypt_file(self):
-        mail = self.mail
-        key = self.key.get()
-        path = self.textbox.get()
-        algo.decrypt(mail,key,path)
-   
-    def voice_key(self):
-        self.key.delete(1.0, tk.END)
-        self.key.insert(tk.END, voice.listen())
-       
-   
-    def open_file(self):
-        filename = self.textbox.get()
-        if file.open_file(filename):
-            messagebox.showinfo("Open File", filename+" successfully opened!")            
-            return
-        messagebox.showerror("Open File", filename+" could not be opened!")  
-        
-    def delete_file(self):
-        filename = self.textbox.get()
-        if file.delete_file(filename):
-            messagebox.showinfo("Delete File", filename+" successfully deleted!")            
-            return
-        messagebox.showerror("Delete File", filename+" could not be deleted!")   
    
     # Func: exit
     def exit_application(self):
@@ -291,65 +334,60 @@ class encryption_app:
 
         self.update_camera()
 
-    # screen: files
     def files_option(self):
         self.clear_screen()
+        
+        self.frame = tk.Frame(self.master)
+        self.frame.pack(fill="both", expand=True)
 
-        # Create a frame to contain all elements
-        frame = tk.Frame(self.master)
-        frame.pack(expand=True, fill=tk.BOTH)
+        self.label = tk.Label(self.frame, text="Current Directory:")
+        self.label.pack()
 
-        # Create a scrollbar for the file listbox
-        scrollbar = tk.Scrollbar(frame)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.scrollbar = tk.Scrollbar(self.frame)
+        self.scrollbar.pack(side="right", fill="y")
 
-        # Create a listbox to display files
-        self.file_listbox = tk.Listbox(frame, yscrollcommand=scrollbar.set)
-        self.file_listbox.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+        self.file_listbox = tk.Listbox(self.frame, yscrollcommand=self.scrollbar.set)
+        self.file_listbox.pack(fill="both", expand=True)
+        self.scrollbar.config(command=self.file_listbox.yview)
 
-        # Populate the listbox with files from the current directory
-        self.populate_listbox('.')
+        self.back_button = tk.Button(self.frame, text="Back", command=self.go_back)
+        self.back_button.pack(side="left")
 
-        # Configure the scrollbar to work with the listbox
-        scrollbar.config(command=self.file_listbox.yview)
+        self.open_button = tk.Button(self.frame, text="OpenFolder", command=self.open_folder)
+        self.open_button.pack(side="right")
 
         # Create a button to choose a file
-        self.choose_button = tk.Button(frame, text="Open", command=self.choose_file)
-        self.choose_button.pack()
+        # self.choose_button = tk.Button(self.frame, text="SelectFile", command=self.choose_file)
+        # self.choose_button.pack()
 
         # Create a text box for displaying file information
-        self.textbox = tk.Text(frame, height=4, width=30)
-        self.textbox.pack(padx=10, pady=10)
+        # self.textbox = tk.Text(self.frame, height=4, width=30)
+        # self.textbox.pack(padx=10, pady=10)
         
-        self.key = tk.Text(frame, height=4, width=30)
+        self.key = tk.Text(self.frame, height=4, width=30)
         self.key.pack(padx=10, pady=10)
 
         # Create buttons for various actions
-        encrypt_button = tk.Button(frame, text="Encrypt")
+        encrypt_button = tk.Button(self.frame, text="Encrypt File",command=self.encrypt_file)
         encrypt_button.pack(side=tk.LEFT, padx=5, pady=5)
         
-        decrypt_button = tk.Button(frame, text="Decrypt")
+        decrypt_button = tk.Button(self.frame, text="Decrypt File",command=self.decrypt_file)
         decrypt_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        voice_button = tk.Button(frame, text="Voice")
+        voice_button = tk.Button(self.frame, text="Voice Key",command=self.voice_key)
         voice_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        open_button = tk.Button(frame, text="Open")
+        open_button = tk.Button(self.frame, text="Open File",command=self.open_file)
         open_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        delete_button = tk.Button(frame, text="Delete")
+        delete_button = tk.Button(self.frame, text="Delete File",command=self.delete_file)
         delete_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         # Create a button to go back to the menu
-        back_button = tk.Button(frame, text="Back", command=self.create_menu)
+        back_button = tk.Button(self.frame, text="Back", command=self.create_menu)
         back_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
-        # Create a button to navigate to the parent directory
-        parent_dir_button = tk.Button(frame, text="Parent Directory", command=lambda: self.populate_listbox('..'))
-        parent_dir_button.pack(side=tk.RIGHT, padx=5, pady=5)
-
-        open_folder_button = tk.Button(frame, text="Parent Directory", command=lambda: self.populate_listbox(self.file_listbox.curselection()))
-        open_folder_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        self.populate_listbox(self.current_path)
 
     def settings_option(self):
         return

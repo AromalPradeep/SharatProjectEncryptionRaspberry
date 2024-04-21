@@ -12,7 +12,10 @@ def verify(email):
     return re.match(pattern, email) is not None
 
 # Func: Check if a user Exist
-def check_if_user_exist(user):    
+def check_if_user_exist(user):   
+
+    if user == "":
+        return False 
     
     for (root, dirs, file) in os.walk(path):
         for f in file:
