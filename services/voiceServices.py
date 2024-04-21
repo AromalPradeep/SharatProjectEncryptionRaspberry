@@ -1,50 +1,26 @@
 import speech_recognition as sr
-import pyttsx3 
 
-# Initialize the recognizer 
-r = sr.Recognizer() 
+def listen():
+    # Initialize the recognizer
+    r = sr.Recognizer()
 
-# Function to convert text to
-# speech
-def speak_text(command):
-	
-	# Initialize the engine
-	engine = pyttsx3.init()
-	engine.say(command) 
-	engine.runAndWait()
+    # Use the default microphone as the audio source
+    with sr.Microphone() as source:
+        print("Listening...")
+        # Listen for the first phrase and extract the audio data
+        audio = r.listen(source)
+    
+    try:
+        print("trying")
+        # Use Google Speech Recognition to convert the speech into text
+        text = r.recognize_google(audio)
+        print("You said: " + text)
+        return text
+    except sr.UnknownValueError:
+        # Error handling for unknown words
+        print("Google Speech Recognition could not understand the audio")
+    except sr.RequestError as e:
+        # Error handling for requests to the service
+        print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-def listen():      
-    # Loop infinitely for user to
-    # speak
-
-    while(1): 
-        
-        # Exception handling to handle
-        # exceptions at the runtime
-        try:
-            
-            # use the microphone as source for input.
-            with sr.Microphone() as source2:
-                
-                # wait for a second to let the recognizer
-                # adjust the energy threshold based on
-                # the surrounding noise level 
-                r.adjust_for_ambient_noise(source2, duration=0.2)
-                
-                #listens for the user's input 
-                audio2 = r.listen(source2)
-                
-                # Using google to recognize audio
-                text = r.recognize_google(audio2)
-                text = text.lower()
-
-                return text
-
-                
-        except sr.RequestError as e:
-            print("Could not request results; {0}".format(e))
-            
-        except sr.UnknownValueError:
-            print("unknown error occurred")
-
-        return ""
+    return ""

@@ -191,7 +191,8 @@ class encryption_app:
    
     def voice_key(self):
         self.key.delete(1.0, tk.END)
-        self.key.insert(tk.END, voice.listen())       
+        text = voice.listen()
+        self.key.insert(tk.END, text)       
    
     def open_file(self):
         filename = self.choose_file()        

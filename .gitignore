@@ -1,5 +1,6 @@
 # .gitignore
 test/
+test.py
 
 # Virtual Environments
 venv/
