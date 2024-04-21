@@ -24,9 +24,9 @@ class encryption_app:
         self.error = ""
         self.exit_flag = 3
 
-        # self.create_login_signup_widgets()
         self.email = "admin"
-        self.files_option()
+        # self.files_option()
+        self.create_login_signup_widgets()
 
 
     # Func: signup
