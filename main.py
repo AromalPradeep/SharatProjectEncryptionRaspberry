@@ -117,7 +117,7 @@ class encryption_app:
         if ret:
             timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
             path = self.current_path
-            cv2.imwrite(path+"//image_"+timestamp+".png", frame)
+            cv2.imwrite(path+"/image_"+timestamp+".png", frame)
             messagebox.showinfo("Capture", "Image captured successfully!")
 
     def populate_listbox(self, path):
