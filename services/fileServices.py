@@ -8,10 +8,12 @@ def clean_path(file_path):
 def open_file(file_path):
     file_path = clean_path(file_path)
     try:
-        # subprocess.run(["xdg-open", file_path])
-        os.startfile(file_path)
+        subprocess.run(["xdg-open", file_path])
     except Exception:
-        return 0
+        try:
+            os.startfile(file_path)
+        except Exception:    
+            return 0
     return 1
 
 # Func: Delete File
