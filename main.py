@@ -6,6 +6,7 @@ import datetime
 # Tkinter
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import PhotoImage
 
 # Services
 import services.userServices as user
@@ -230,26 +231,34 @@ class encryption_app:
         frame = tk.Frame(self.master)
         frame.pack(expand=True, fill=tk.BOTH)
         
+        
         # Create labels and entries for email and password
         email_frame = tk.Frame(frame)
-        email_frame.pack(pady=(10, 0))
-        tk.Label(email_frame, text="email:").pack(side=tk.LEFT, padx=(10, 5))
+        email_frame.pack(pady=(20, 0))
+        tk.Label(email_frame, text="      email:", fg="white",bg="black").pack(side=tk.LEFT, padx=(10, 5))
         self.email_entry = tk.Entry(email_frame)
         self.email_entry.pack(side=tk.LEFT)
 
         password_frame = tk.Frame(frame)
         password_frame.pack()
-        tk.Label(password_frame, text="Password:").pack(side=tk.LEFT, padx=(10, 5))
+        tk.Label(password_frame, text="Password:", fg="white",bg="black").pack(side=tk.LEFT, padx=(10, 5))
         self.password_entry = tk.Entry(password_frame, show="*")
         self.password_entry.pack(side=tk.LEFT)
+
+        #set backround and frame color
+        frame.configure(bg="black")
+        email_frame.configure(bg="black")
+        password_frame.configure(bg="black")
+        
 
         # Create login and signup buttons
         login_signup_frame = tk.Frame(frame)
         login_signup_frame.pack(pady=10)
-        self.login_button = tk.Button(login_signup_frame, text="Login", command=self.login)
+        self.login_button = tk.Button(login_signup_frame, text="Log in",font=("Times New Roman", 12),fg="red",bg="black",command=self.login)
         self.login_button.pack(side=tk.LEFT, padx=5)
-        self.signup_button = tk.Button(login_signup_frame, text="Signup", command=self.signup)
+        self.signup_button = tk.Button(login_signup_frame, text="Sign up",fg="red",bg="black", command=self.signup)
         self.signup_button.pack(side=tk.LEFT)
+        login_signup_frame.configure(bg="black")
 
         # tk.Label(text = self.error)            
 
@@ -341,8 +350,7 @@ class encryption_app:
         self.clear_screen()
         
         self.frame = tk.Frame(self.master)
-        self.frame.pack(fill="both", expand=True)
-
+        self.frame.pack(fill="both", expand=True)  
         self.label = tk.Label(self.frame, text="Current Directory:")
         self.label.pack()
 
