@@ -116,7 +116,7 @@ class encryption_app:
         ret, frame = self.cap.read()
         if ret:
             timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            path = ".//data//pictures//"
+            path = self.current_path
             cv2.imwrite(path+"image_"+timestamp+".png", frame)
             messagebox.showinfo("Capture", "Image captured successfully!")
 
