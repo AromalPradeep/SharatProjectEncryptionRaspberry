@@ -21,7 +21,9 @@ class encryption_app:
         self.master.title("Encryption App")
         self.master.geometry("800x400")
 
-        self.current_path = "/home/techmavericks/Desktop/project/imageEncryption/SharatProjectEncryptionRaspberry/data/pictures"
+        # self.current_path = "D:\Programming2\Projects\SharatProject\data\pictures"
+        self.current_path = os.getcwd()+"\data\pictures"
+        
         self.error = ""
         self.exit_flag = 3
 
@@ -114,8 +116,8 @@ class encryption_app:
     def capture_image(self):
         ret, frame = self.cap.read()
         if ret:
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            path = "//home//techmavericks//Desktop//project//imageEncryption//SharatProjectEncryptionRaspberry//data//pictures//"
+            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            path = self.current_path
             cv2.imwrite(path+"image_"+timestamp+".png", frame)
             messagebox.showinfo("Capture", "Image captured successfully!")
 
