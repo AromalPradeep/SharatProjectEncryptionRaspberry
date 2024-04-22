@@ -157,7 +157,7 @@ class encryption_app:
             messagebox.showwarning("Warning", "Please select a file.")
             return -1
         selected_file = self.file_listbox.get(selected_file_index)
-        file_path = self.current_path + "\\" + selected_file
+        file_path = self.current_path + "/" + selected_file
         # self.textbox.delete(1.0, tk.END)
         # self.textbox.insert(tk.END, file_path)
         return file_path
